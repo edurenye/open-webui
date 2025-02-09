@@ -30,6 +30,7 @@
 	export let user = $_user;
 
 	export let prompt;
+	export let params;
 	export let history = {};
 	export let selectedModels;
 	export let atSelectedModel;
@@ -449,6 +450,7 @@
 							messageId={message.id}
 							idx={messageIdx}
 							{user}
+							{params}
 							{gotoMessage}
 							{showPreviousMessage}
 							{showNextMessage}

@@ -2169,10 +2169,13 @@ FIRECRAWL_API_BASE_URL = PersistentConfig(
 # Images
 ####################################
 
-IMAGE_GENERATION_ENGINE = PersistentConfig(
-    "IMAGE_GENERATION_ENGINE",
-    "image_generation.engine",
-    os.getenv("IMAGE_GENERATION_ENGINE", "openai"),
+DEFAULT_IMAGE_SIZE = "512x512"
+DEFAULT_IMAGE_STEPS = 50
+
+DEFAULT_IMAGE_GENERATION_ENGINE = PersistentConfig(
+    "DEFAULT_IMAGE_GENERATION_ENGINE",
+    "image_generation.default_engine",
+    os.getenv("DEFAULT_IMAGE_GENERATION_ENGINE", "openai"),
 )
 
 ENABLE_IMAGE_GENERATION = PersistentConfig(
@@ -2187,58 +2190,81 @@ ENABLE_IMAGE_PROMPT_GENERATION = PersistentConfig(
     os.environ.get("ENABLE_IMAGE_PROMPT_GENERATION", "true").lower() == "true",
 )
 
-AUTOMATIC1111_BASE_URL = PersistentConfig(
-    "AUTOMATIC1111_BASE_URL",
-    "image_generation.automatic1111.base_url",
-    os.getenv("AUTOMATIC1111_BASE_URL", ""),
-)
-AUTOMATIC1111_API_AUTH = PersistentConfig(
-    "AUTOMATIC1111_API_AUTH",
-    "image_generation.automatic1111.api_auth",
-    os.getenv("AUTOMATIC1111_API_AUTH", ""),
-)
+OPENAI_IMAGE_DEFAULT_MODEL_WRAPPERS = [
+    {
+        "id": "",
+        "name": "",
+        "model": os.getenv("IMAGE_GENERATION_MODEL", ""),
+        "is_default": True,
+        "enabled": True,
+        "image_size": DEFAULT_IMAGE_SIZE,
+        "image_steps": DEFAULT_IMAGE_STEPS,
+        "access_control": {
+            "read": {
+                "group_ids": []
+            },
+            "write": {
+                "group_ids": []
+            }
+        },
+        "visibility": "public"
+    }
+]
 
-AUTOMATIC1111_CFG_SCALE = PersistentConfig(
-    "AUTOMATIC1111_CFG_SCALE",
-    "image_generation.automatic1111.cfg_scale",
-    (
-        float(os.environ.get("AUTOMATIC1111_CFG_SCALE"))
-        if os.environ.get("AUTOMATIC1111_CFG_SCALE")
-        else None
-    ),
-)
-
-
-AUTOMATIC1111_SAMPLER = PersistentConfig(
-    "AUTOMATIC1111_SAMPLER",
-    "image_generation.automatic1111.sampler",
-    (
-        os.environ.get("AUTOMATIC1111_SAMPLER")
-        if os.environ.get("AUTOMATIC1111_SAMPLER")
-        else None
-    ),
-)
-
-AUTOMATIC1111_SCHEDULER = PersistentConfig(
-    "AUTOMATIC1111_SCHEDULER",
-    "image_generation.automatic1111.scheduler",
-    (
-        os.environ.get("AUTOMATIC1111_SCHEDULER")
-        if os.environ.get("AUTOMATIC1111_SCHEDULER")
-        else None
-    ),
+OPENAI_IMAGE_CONFIG = PersistentConfig(
+    "OPENAI_IMAGE_CONFIG",
+    "image_generation.openai",
+    {
+        "api_base_url": os.getenv("IMAGES_OPENAI_API_BASE_URL", OPENAI_API_BASE_URL),
+        "api_key": os.getenv("IMAGES_OPENAI_API_KEY", OPENAI_API_KEY),
+        "model_wrappers": OPENAI_IMAGE_DEFAULT_MODEL_WRAPPERS,
+    }
 )
 
-COMFYUI_BASE_URL = PersistentConfig(
-    "COMFYUI_BASE_URL",
-    "image_generation.comfyui.base_url",
-    os.getenv("COMFYUI_BASE_URL", ""),
-)
+AUTOMATIC1111_DEFAULT_MODEL_WRAPPERS = [
+    {
+        "id": "",
+        "name": "",
+        "model": os.getenv("IMAGE_GENERATION_MODEL", ""),
+        "is_default": True,
+        "enabled": True,
+        "image_size": DEFAULT_IMAGE_SIZE,
+        "image_steps": DEFAULT_IMAGE_STEPS,
+        "cfg_scale": (
+            float(os.environ.get("AUTOMATIC1111_CFG_SCALE"))
+            if os.environ.get("AUTOMATIC1111_CFG_SCALE")
+            else None
+        ),
+        "sampler": (
+            os.environ.get("AUTOMATIC1111_SAMPLER")
+            if os.environ.get("AUTOMATIC1111_SAMPLER")
+            else None
+        ),
+        "scheduler": (
+            os.environ.get("AUTOMATIC1111_SCHEDULER")
+            if os.environ.get("AUTOMATIC1111_SCHEDULER")
+            else None
+        ),
+        "access_control": {
+            "read": {
+                "group_ids": []
+            },
+            "write": {
+                "group_ids": []
+            }
+        },
+        "visibility": "public"
+    }
+]
 
-COMFYUI_API_KEY = PersistentConfig(
-    "COMFYUI_API_KEY",
-    "image_generation.comfyui.api_key",
-    os.getenv("COMFYUI_API_KEY", ""),
+AUTOMATIC1111_CONFIG = PersistentConfig(
+    "AUTOMATIC1111_CONFIG",
+    "image_generation.automatic1111",
+    {
+        "api_base_url": os.getenv("AUTOMATIC1111_BASE_URL", ""),
+        "api_key": os.getenv("AUTOMATIC1111_API_AUTH", ""),
+        "model_wrappers": AUTOMATIC1111_DEFAULT_MODEL_WRAPPERS,
+    }
 )
 
 COMFYUI_DEFAULT_WORKFLOW = """
@@ -2351,53 +2377,68 @@ COMFYUI_DEFAULT_WORKFLOW = """
 }
 """
 
+COMFYUI_DEFAULT_MODEL_WRAPPERS = [
+    {
+        "id": "",
+        "name": "",
+        "model": os.getenv("IMAGE_GENERATION_MODEL", ""),
+        "is_default": True,
+        "enabled": True,
+        "image_size": DEFAULT_IMAGE_SIZE,
+        "image_steps": DEFAULT_IMAGE_STEPS,
+        "workflow": os.getenv("COMFYUI_WORKFLOW", COMFYUI_DEFAULT_WORKFLOW),
+        "workflowNodes": [],
+        "access_control": {
+            "read": {
+                "group_ids": []
+            },
+            "write": {
+                "group_ids": []
+            }
+        },
+        "visibility": "public",
+    }
+]
 
-COMFYUI_WORKFLOW = PersistentConfig(
-    "COMFYUI_WORKFLOW",
-    "image_generation.comfyui.workflow",
-    os.getenv("COMFYUI_WORKFLOW", COMFYUI_DEFAULT_WORKFLOW),
-)
-
-COMFYUI_WORKFLOW_NODES = PersistentConfig(
-    "COMFYUI_WORKFLOW",
-    "image_generation.comfyui.nodes",
-    [],
-)
-
-IMAGES_OPENAI_API_BASE_URL = PersistentConfig(
-    "IMAGES_OPENAI_API_BASE_URL",
-    "image_generation.openai.api_base_url",
-    os.getenv("IMAGES_OPENAI_API_BASE_URL", OPENAI_API_BASE_URL),
-)
-IMAGES_OPENAI_API_KEY = PersistentConfig(
-    "IMAGES_OPENAI_API_KEY",
-    "image_generation.openai.api_key",
-    os.getenv("IMAGES_OPENAI_API_KEY", OPENAI_API_KEY),
-)
-
-IMAGES_GEMINI_API_BASE_URL = PersistentConfig(
-    "IMAGES_GEMINI_API_BASE_URL",
-    "image_generation.gemini.api_base_url",
-    os.getenv("IMAGES_GEMINI_API_BASE_URL", GEMINI_API_BASE_URL),
-)
-IMAGES_GEMINI_API_KEY = PersistentConfig(
-    "IMAGES_GEMINI_API_KEY",
-    "image_generation.gemini.api_key",
-    os.getenv("IMAGES_GEMINI_API_KEY", GEMINI_API_KEY),
+COMFYUI_CONFIG = PersistentConfig(
+    "COMFYUI_CONFIG",
+    "image_generation.comfyui",
+    {
+        "api_base_url": os.getenv("COMFYUI_BASE_URL", ""),
+        "api_key": os.getenv("COMFYUI_API_KEY", ""),
+        "model_wrappers": COMFYUI_DEFAULT_MODEL_WRAPPERS,
+    }
 )
 
-IMAGE_SIZE = PersistentConfig(
-    "IMAGE_SIZE", "image_generation.size", os.getenv("IMAGE_SIZE", "512x512")
-)
+GEMINI_IMAGE_DEFAULT_MODEL_WRAPPERS = [
+    {
+        "id": "",
+        "name": "",
+        "model": os.getenv("IMAGE_GENERATION_MODEL", ""),
+        "is_default": True,
+        "enabled": True,
+        "image_size": DEFAULT_IMAGE_SIZE,
+        "image_steps": DEFAULT_IMAGE_STEPS,
+        "access_control": {
+            "read": {
+                "group_ids": []
+            },
+            "write": {
+                "group_ids": []
+            }
+        },
+        "visibility": "public"
+    }
+]
 
-IMAGE_STEPS = PersistentConfig(
-    "IMAGE_STEPS", "image_generation.steps", int(os.getenv("IMAGE_STEPS", 50))
-)
-
-IMAGE_GENERATION_MODEL = PersistentConfig(
-    "IMAGE_GENERATION_MODEL",
-    "image_generation.model",
-    os.getenv("IMAGE_GENERATION_MODEL", ""),
+GEMINI_CONFIG = PersistentConfig(
+    "GEMINI_CONFIG",
+    "image_generation.gemini",
+    {
+        "api_base_url": os.getenv("IMAGES_GEMINI_API_BASE_URL", GEMINI_API_BASE_URL),
+        "api_key": os.getenv("IMAGES_GEMINI_API_KEY", GEMINI_API_KEY),
+        "model_wrappers": GEMINI_IMAGE_DEFAULT_MODEL_WRAPPERS,
+    }
 )
 
 ####################################

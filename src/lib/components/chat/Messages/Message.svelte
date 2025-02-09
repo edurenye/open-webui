@@ -20,6 +20,8 @@
 
 	export let user;
 
+	export let params;
+
 	export let gotoMessage;
 	export let showPreviousMessage;
 	export let showNextMessage;
@@ -68,6 +70,7 @@
 		{:else if (history.messages[history.messages[messageId].parentId]?.models?.length ?? 1) === 1}
 			<ResponseMessage
 				{chatId}
+				{params}
 				{history}
 				{messageId}
 				isLastMessage={messageId === history.currentId}
@@ -91,6 +94,7 @@
 			<MultiResponseMessages
 				bind:history
 				{chatId}
+				{params}
 				{messageId}
 				isLastMessage={messageId === history?.currentId}
 				{updateChat}

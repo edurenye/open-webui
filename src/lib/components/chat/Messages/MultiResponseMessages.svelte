@@ -21,6 +21,7 @@
 	dayjs.extend(localizedFormat);
 
 	export let chatId;
+	export let params;
 	export let history;
 	export let messageId;
 
@@ -249,6 +250,7 @@
 							{#if message}
 								<ResponseMessage
 									{chatId}
+									{params}
 									{history}
 									messageId={_messageId}
 									isLastMessage={true}

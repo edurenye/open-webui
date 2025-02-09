@@ -2015,6 +2015,7 @@
 									bind:history
 									bind:autoScroll
 									bind:prompt
+									{params}
 									{selectedModels}
 									{atSelectedModel}
 									{sendPrompt}
